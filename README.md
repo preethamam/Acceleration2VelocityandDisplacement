@@ -1,5 +1,5 @@
 # Introduction
-Filters and converts the acceleration data to velocities and displacements using the signal processing algorithms.
+Filters and converts the acceleration data to velocities, displacements and frequencies using the signal processing algorithms.
 
 # Quick Pipeline Visualization
 ## Example: Acceleration, velocity and displacements visualization
