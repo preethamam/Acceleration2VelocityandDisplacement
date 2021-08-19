@@ -42,6 +42,7 @@ function [LVDTfilt, filtered_disp, filtered_vel, filtered_acc ] ...
 %          filtered_acc   - Filtered acceleration
 % 
 % Demo input data is available at https://github.com/preethamam/Acceleration2VelocityandDisplacement
+
     % Accelerometer to Displcment
     filtered_disp = zeros(size(Accmat));
     filtered_vel = zeros(size(Accmat));
@@ -66,144 +67,144 @@ function [LVDTfilt, filtered_disp, filtered_vel, filtered_acc ] ...
         LVDTfilt(:,i)  = sigflt;
         end
     end
-end
 
-function [x_Time, xd_Time, xdd_Time] = func_acc2disp(t, signalIN, cutoff, alpha, filtertype...
-                                                     ,filtermethod,firorder)
+    function [x_Time, xd_Time, xdd_Time] = func_acc2disp(t, signalIN, cutoff, alpha, filtertype...
+                                                         ,filtermethod,firorder)
 
-% Function acc2disp performs the filtering in frequency domain and then double integration to
-% obtain the displacment from acceleration
+    % Function acc2disp performs the filtering in frequency domain and then double integration to
+    % obtain the displacment from acceleration
 
-%% Input Analyzer
-xdd = signalIN; 
-dt = abs(t(5)-t(4));
-Fs = 1/dt;
+    %% Input Analyzer
+    xdd = signalIN; 
+    dt = abs(t(5)-t(4));
+    Fs = 1/dt;
 
-%% Double Integration
-% Filter the Acceleration Signal and Set the First k values constant (suppress  frequency content)
-[xdd_Time,~] = ...
-          func_DCclean(xdd, cutoff, alpha, Fs, filtertype,filtermethod,firorder);
+    %% Double Integration
+    % Filter the Acceleration Signal and Set the First k values constant (suppress  frequency content)
+    [xdd_Time,~] = ...
+              func_DCclean(xdd, cutoff, alpha, Fs, filtertype,filtermethod,firorder);
 
-%//%------------------------------------------------------------------------%
-% Perform 1st Integration and Filter the Acceleration Signal
-Xd_int = dt * cumtrapz(xdd_Time);
+    %//%------------------------------------------------------------------------%
+    % Perform 1st Integration and Filter the Acceleration Signal
+    Xd_int = dt * cumtrapz(xdd_Time);
 
-% Filter the Velocity Signal and Set the First k values constant (suppress  frequency content)
-[xd_Time, ~] = ...
-          func_DCclean(Xd_int, cutoff, alpha, Fs, filtertype,filtermethod,firorder);
+    % Filter the Velocity Signal and Set the First k values constant (suppress  frequency content)
+    [xd_Time, ~] = ...
+              func_DCclean(Xd_int, cutoff, alpha, Fs, filtertype,filtermethod,firorder);
 
-%//%------------------------------------------------------------------------%
-% Perform 2st Integration and Filter the Velocity Signal
-X_int = dt * cumtrapz(xd_Time);
+    %//%------------------------------------------------------------------------%
+    % Perform 2st Integration and Filter the Velocity Signal
+    X_int = dt * cumtrapz(xd_Time);
 
-% Filter the displacement Signal and Set the First k values constant (suppress  frequency content)
-% Displacement unfiltered
-[x_TimeNF, ~] = ...
-          func_DCclean(X_int, cutoff, alpha, Fs, filtertype,filtermethod,firorder);
+    % Filter the displacement Signal and Set the First k values constant (suppress  frequency content)
+    % Displacement unfiltered
+    [x_TimeNF, ~] = ...
+              func_DCclean(X_int, cutoff, alpha, Fs, filtertype,filtermethod,firorder);
 
-%//%------------------------------------------------------------------------%
-% Final Filtering of Retrived Displacement Data and Set the First k values constant (suppress frequency content)
+    %//%------------------------------------------------------------------------%
+    % Final Filtering of Retrived Displacement Data and Set the First k values constant (suppress frequency content)
 
-%Displacement filtered
-[x_Time, ~] = ...
-          func_DCclean(x_TimeNF, cutoff, alpha, Fs, filtertype,filtermethod,firorder);
-
-
-end
+    %Displacement filtered
+    [x_Time, ~] = ...
+              func_DCclean(x_TimeNF, cutoff, alpha, Fs, filtertype,filtermethod,firorder);
 
 
-function [sigflt, sigfrq] = ...
-          func_DCclean(sig, cutoff, alpha, fs, passtype,filtermethod,firorder)
-
-% This function FUNC_DCCLEAN removes the low frequency content (for the
-% given cutoff value) and the DC offset
-
-x = length(sig); 
-k = cutoff*(x/fs);
-n = round(k);
+    end
 
 
-switch filtermethod
-    case 'fft'
-        SIG_fft = fft(sig, x);
-        switch passtype 
-            case 'lowpass'
-                SIG_fft(1) = complex(alpha*abs(SIG_fft(n(1))),0);
-                SIG_fft(x) = complex(alpha*abs(SIG_fft(n(1))),0);
-                if (length(n)>1)
-                   error('Too many cutoff frequencies') 
-                end
-                for i=n:round((x/2)-1)
-                    SIG_fft(i) = alpha*SIG_fft(n);
-                    SIG_fft(x-i) = conj(SIG_fft(i));
-                end
+    function [sigflt, sigfrq] = ...
+              func_DCclean(sig, cutoff, alpha, fs, passtype,filtermethod,firorder)
 
-            case 'highpass'
-                SIG_fft(1) = complex(alpha*abs(SIG_fft(n(1))),0);
-                if (length(n)>1)
-                   error('Too many cutoff frequencies') 
-                end
-                for i=2:n-1
-                    SIG_fft(i) = alpha*SIG_fft(n);
-                    SIG_fft(x-(i-2)) = conj(SIG_fft(i));
-                end
+    % This function FUNC_DCCLEAN removes the low frequency content (for the
+    % given cutoff value) and the DC offset
 
-            otherwise
-                if (length(n)>2)
-                   error('Too many cutoff frequencies') 
-                elseif (length(n)<2)
-                   error('Too few cutoff frequencies') 
-                end
+    x = length(sig); 
+    k = cutoff*(x/fs);
+    n = round(k);
 
-                SIG_fft(1) = complex(alpha*abs(SIG_fft(n(1))),0);
-                SIG_fft(x) = complex(alpha*abs(SIG_fft(n(1))),0);
-                for i = n(2):round((x/2)-1)
-                    SIG_fft(i) = alpha*SIG_fft(n(2));
-                    SIG_fft(x-i) = conj(SIG_fft(i));
-                end
 
-                for i = n(1):-1:2
-                    SIG_fft(i) = alpha*SIG_fft(n(1));
-                    SIG_fft(x-i) = conj(SIG_fft(i));
-                end        
-        
-        end 
-        sigfrq = SIG_fft;
-        sigflt = real(ifft(SIG_fft));
-           
-    case 'fir'
-        
-        switch passtype
-            case 'lowpass'
-                if (length(cutoff)>1)
-                   error('Too many cutoff frequencies') 
-                end
-                h=fdesign.lowpass('N,Fc',firorder,cutoff,fs);
-                d=design(h); %Lowpass FIR filter
-                sigflt=filtfilt(d.Numerator,1,sig); %zero-phase filtering 
-                sigfrq = abs(fft(sigflt,x));
-                
-            case 'highpass'
-                if (length(cutoff)>1)
-                   error('Too many cutoff frequencies') 
-                end
-                h=fdesign.highpass('N,Fc',firorder,cutoff,fs);
-                d=design(h); %Highpass FIR filter
-                sigflt=filtfilt(d.Numerator,1,sig); %zero-phase filtering 
-                sigfrq = abs(fft(sigflt,x));              
-                
-            otherwise 
-                if (length(cutoff)>2)
-                   error('Too many cutoff frequencies') 
-                elseif (length(cutoff)<2)
-                   error('Too few cutoff frequencies') 
-                end
-                h=fdesign.bandpass('N,Fc1,Fc2',firorder,cutoff(1),cutoff(2),fs);
-                d=design(h); %Bandpass FIR filter
-                sigflt=filtfilt(d.Numerator,1,sig); %zero-phase filtering 
-                sigfrq = abs(fft(sigflt,x));     
-                
-        end      
-end
-   
+    switch filtermethod
+        case 'fft'
+            SIG_fft = fft(sig, x);
+            switch passtype 
+                case 'lowpass'
+                    SIG_fft(1) = complex(alpha*abs(SIG_fft(n(1))),0);
+                    SIG_fft(x) = complex(alpha*abs(SIG_fft(n(1))),0);
+                    if (length(n)>1)
+                       error('Too many cutoff frequencies') 
+                    end
+                    for i=n:round((x/2)-1)
+                        SIG_fft(i) = alpha*SIG_fft(n);
+                        SIG_fft(x-i) = conj(SIG_fft(i));
+                    end
+
+                case 'highpass'
+                    SIG_fft(1) = complex(alpha*abs(SIG_fft(n(1))),0);
+                    if (length(n)>1)
+                       error('Too many cutoff frequencies') 
+                    end
+                    for i=2:n-1
+                        SIG_fft(i) = alpha*SIG_fft(n);
+                        SIG_fft(x-(i-2)) = conj(SIG_fft(i));
+                    end
+
+                otherwise
+                    if (length(n)>2)
+                       error('Too many cutoff frequencies') 
+                    elseif (length(n)<2)
+                       error('Too few cutoff frequencies') 
+                    end
+
+                    SIG_fft(1) = complex(alpha*abs(SIG_fft(n(1))),0);
+                    SIG_fft(x) = complex(alpha*abs(SIG_fft(n(1))),0);
+                    for i = n(2):round((x/2)-1)
+                        SIG_fft(i) = alpha*SIG_fft(n(2));
+                        SIG_fft(x-i) = conj(SIG_fft(i));
+                    end
+
+                    for i = n(1):-1:2
+                        SIG_fft(i) = alpha*SIG_fft(n(1));
+                        SIG_fft(x-i) = conj(SIG_fft(i));
+                    end        
+
+            end 
+            sigfrq = SIG_fft;
+            sigflt = real(ifft(SIG_fft));
+
+        case 'fir'
+
+            switch passtype
+                case 'lowpass'
+                    if (length(cutoff)>1)
+                       error('Too many cutoff frequencies') 
+                    end
+                    h=fdesign.lowpass('N,Fc',firorder,cutoff,fs);
+                    d=design(h); %Lowpass FIR filter
+                    sigflt=filtfilt(d.Numerator,1,sig); %zero-phase filtering 
+                    sigfrq = abs(fft(sigflt,x));
+
+                case 'highpass'
+                    if (length(cutoff)>1)
+                       error('Too many cutoff frequencies') 
+                    end
+                    h=fdesign.highpass('N,Fc',firorder,cutoff,fs);
+                    d=design(h); %Highpass FIR filter
+                    sigflt=filtfilt(d.Numerator,1,sig); %zero-phase filtering 
+                    sigfrq = abs(fft(sigflt,x));              
+
+                otherwise 
+                    if (length(cutoff)>2)
+                       error('Too many cutoff frequencies') 
+                    elseif (length(cutoff)<2)
+                       error('Too few cutoff frequencies') 
+                    end
+                    h=fdesign.bandpass('N,Fc1,Fc2',firorder,cutoff(1),cutoff(2),fs);
+                    d=design(h); %Bandpass FIR filter
+                    sigflt=filtfilt(d.Numerator,1,sig); %zero-phase filtering 
+                    sigfrq = abs(fft(sigflt,x));     
+
+            end      
+    end
+
+    end
 end
