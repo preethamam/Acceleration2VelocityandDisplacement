@@ -1,5 +1,5 @@
 function [LVDTfilt, filtered_disp, filtered_vel, filtered_acc ] ...
-          = accelo2disp(t, Ts, Fs, Fcut,alpha, Accmat, Lvdtmat,...
+          = accelo2disp(t, Ts, Fqs, Fcut,alpha, Accmat, Lvdtmat,...
                             lvdtcons, accbiasV, accsensi, filtertype...
                             ,filtermethod,firorder)
 
@@ -23,7 +23,7 @@ function [LVDTfilt, filtered_disp, filtered_vel, filtered_acc ] ...
 %
 % Inputs: t             - time vector
 %         Ts            - sampling period
-%         Fs            - sampling frequency
+%         Fqs           - sampling frequency
 %         Fcut          - filter Cut-off Frequency scalar for high and low
 %                         pass filters. [minimum value maximum value] for bandpass filter.
 %         alpha         - scaling constant
@@ -48,23 +48,23 @@ function [LVDTfilt, filtered_disp, filtered_vel, filtered_acc ] ...
     filtered_vel = zeros(size(Accmat));
     filtered_acc = zeros(size(Accmat));
     
-    for i=1:size(Accmat,2)
+    for ii=1:size(Accmat,2)
         [x_Time, xd_Time, xdd_Time] = ...
-            func_acc2disp(t, Accmat(:,i), Fcut, alpha, filtertype,...
+            func_acc2disp(t, Accmat(:,ii), Fcut, alpha, filtertype,...
                             filtermethod,firorder);
-        filtered_disp(:,i) = x_Time;
-        filtered_vel(:,i)  = xd_Time;
-        filtered_acc(:,i)  = xdd_Time;
+        filtered_disp(:,ii) = x_Time;
+        filtered_vel(:,ii)  = xd_Time;
+        filtered_acc(:,ii)  = xdd_Time;
     end
 
     % LVDT Displacement DC Clean
     LVDTfilt = zeros(size(Lvdtmat));
     if ~(isempty(Lvdtmat))
-        for i=1:size(Lvdtmat,2)    
+        for jj=1:size(Lvdtmat,2)    
         [sigflt, sigfft]...
-                = func_DCclean(Lvdtmat(:,i)*lvdtcons(i), Fcut,alpha, Fs, filtertype,filtermethod,...
+                = func_DCclean(Lvdtmat(:,jj)*lvdtcons(jj), Fcut,alpha, Fqs, filtertype,filtermethod,...
                                 firorder);
-        LVDTfilt(:,i)  = sigflt;
+        LVDTfilt(:,jj)  = sigflt;
         end
     end
 
