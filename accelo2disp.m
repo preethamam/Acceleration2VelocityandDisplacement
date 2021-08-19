@@ -41,7 +41,7 @@ function [LVDTfilt, filtered_disp, filtered_vel, filtered_acc ] ...
 %          filtered_vel   - Filtered velocities
 %          filtered_acc   - Filtered acceleration
 % 
-
+% Demo input data is available in: https://github.com/preethamam/Acceleration2VelocityandDisplacement
     % Accelerometer to Displcment
     filtered_disp = zeros(size(Accmat));
     filtered_vel = zeros(size(Accmat));
