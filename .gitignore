@@ -1,0 +1,23 @@
+# Ignore Mac system files
+.DS_store
+
+# Ignore node_modules folder
+node_modules
+
+# Ignore all files
+*.txt
+*.mat
+*.MAT
+*.pdf
+*.PDF
+*.pcd
+
+"acc velo disp 1.png"
+"acc velo disp 2.png"
+
+# Ignore files related to API keys
+.env
+
+# Ignore SASS config files
+.sass-cache
+
