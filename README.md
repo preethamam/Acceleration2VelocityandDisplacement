@@ -1,4 +1,6 @@
 # Introduction
+[![View Acceleration to velocity and displacement using DSP filters on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/97012-acceleration-to-velocity-and-displacement-using-dsp-filters) [![Open in MATLAB Online](https://www.mathworks.com/images/responsive/global/open-in-matlab-online.svg)](https://matlab.mathworks.com/open/github/v1?repo=preethamam/Acceleration2VelocityandDisplacement)
+
 Filters and converts the acceleration data to velocities, displacements and frequencies using the signal processing algorithms.
 
 # Quick Pipeline Visualization
@@ -15,8 +17,6 @@ Filters and converts the acceleration data to velocities, displacements and freq
 MATLAB <br />
 MATLAB - Signal Processing Toolbox
 
-# MATLAB Central
-[![View Acceleration to velocity and displacement using DSP filters on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/97012-acceleration-to-velocity-and-displacement-using-dsp-filters)
-
+# Feedback
 Please rate and provide feedback for the further improvements.
 
