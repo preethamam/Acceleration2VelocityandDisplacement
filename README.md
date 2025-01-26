@@ -15,7 +15,7 @@ Filters and converts the acceleration data to velocities, displacements and freq
 
 # Requirements
 MATLAB <br />
-MATLAB - Signal Processing Toolbox
+Signal Processing Toolbox
 
 # Feedback
 Please rate and provide feedback for the further improvements.
